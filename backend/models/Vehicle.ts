@@ -5,6 +5,7 @@ export interface IVehicle extends Document {
     capacity: number;
     type: string;
     number: string;
+    currentDelivery: mongoose.Types.ObjectId | null
 }
 
 const VehicleSchema = new Schema<IVehicle>({
@@ -19,6 +20,11 @@ const VehicleSchema = new Schema<IVehicle>({
     number: {
         type: String,
         required: true
+    },
+    currentDelivery: {
+        type: Schema.Types.ObjectId,
+        ref: "Delivery",
+        default: null
     }
 })
 

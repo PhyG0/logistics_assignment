@@ -12,7 +12,8 @@ export interface IUser extends Document {
     password: string,
     location: string,
     role: Role,
-    age: number
+    age: number,
+    phone: string
 }
 
 const UserSchema = new Schema<IUser>({
@@ -39,6 +40,11 @@ const UserSchema = new Schema<IUser>({
 
     age: {
         type: Number
+    }, 
+
+    phone: {
+        type: String, 
+        required: true
     }
 
 })

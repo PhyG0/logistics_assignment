@@ -6,6 +6,7 @@ import connectDB from "./config/database";
 
 import authRoutes from "./routes/auth";
 import vehicleRoutes from "./routes/vehicle";
+import deliveryRoutes from "./routes/delivery";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ const main = async () => {
 
     app.use("/api/auth", authRoutes);
     app.use("/api/vehicle", vehicleRoutes);
+    app.use("/api/delivery", deliveryRoutes);
 
     app.listen(process.env.PORT, () => {
         console.log(`Server is running on port ${process.env.PORT}`);

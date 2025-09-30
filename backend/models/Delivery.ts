@@ -10,7 +10,7 @@ export interface IDelivery extends Document {
     startTime: Date,
     endTime: Date,
     createdAt: Date,
-    currentLocation: string
+    currentLocation: string,
 }
 
 export const DeliverySchema = new Schema<IDelivery>({
@@ -36,7 +36,6 @@ export const DeliverySchema = new Schema<IDelivery>({
     },
     startTime: {
         type: Date,
-        required: true
     },
     endTime: {
         type: Date

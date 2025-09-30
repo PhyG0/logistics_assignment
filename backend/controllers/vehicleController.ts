@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Delivery } from "../models/Delivery";
 import { Vehicle } from "../models/Vehicle";
 
 export interface IRequest extends Request {
@@ -31,6 +32,8 @@ export const addVehicle = async (req: IRequest, res: Response) => {
     try{
         const { capacity, type, number } = req.body
         if(!capacity || !type || !number) return res.status(400).json({ message: "Capacity, type and number are required" })
+        const existingVehicle = await Vehicle.findOne({ number });
+        if(existingVehicle) return res.status(400).json({ message: "Vehicle already exists" })
         const vehicle = await Vehicle.create({ capacity, type, number })
         return res.status(201).json(vehicle)
     } catch (error) {
