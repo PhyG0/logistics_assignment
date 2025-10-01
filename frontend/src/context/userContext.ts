@@ -7,6 +7,7 @@ export interface IUser {
     location: string;
     role: string;
     age: number;
+    id: string;
 }
 
 export interface IUserContext {

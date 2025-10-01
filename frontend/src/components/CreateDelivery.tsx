@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
+import { useSocket } from "../hooks/useSocket";
+import toast from "react-hot-toast";
 
 interface Driver {
   _id: string;
@@ -26,6 +28,7 @@ const CreateDelivery = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const { emit } = useSocket();
 
   const [formData, setFormData] = useState({
     vehicleNumber: "",
@@ -64,7 +67,7 @@ const CreateDelivery = () => {
   const handleSubmit = async () => {
     const result = await sendRequest("/api/delivery", "POST", formData);
     if (result) {
-      alert("Delivery created successfully!");
+      toast.success("Delivery created successfully!");
       setFormData({
         vehicleNumber: "",
         driverEmail: "",
@@ -75,6 +78,7 @@ const CreateDelivery = () => {
       });
       fetchVehicles();
       fetchDrivers();
+      emit("message", {from: "admin", to: "driver", type: "new-delivery", data: result});
     }
   };
 

@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
-import { io, Socket } from "socket.io-client";
+import { useSocket } from "../hooks/useSocket"; 
 import useUser from "../hooks/useUser";
 import type { IUserContext } from "../context/userContext";
-
-const socket: Socket = io("http://localhost:3001");
+import toast from "react-hot-toast";
 
 interface Delivery {
   _id: string;
@@ -23,11 +22,14 @@ export interface IMessage {
   from: string;
   to: string;
   type: string;
-  data: Delivery
+  data: Delivery;
 }
 
 const DriverPanel = () => {
   const { sendRequest, loading, error } = useApi();
+  const { user } = useUser() as IUserContext;
+  const { emit, on, off } = useSocket();
+
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(null);
   const [updateForm, setUpdateForm] = useState({
@@ -37,27 +39,30 @@ const DriverPanel = () => {
   });
   const [showModal, setShowModal] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
-  const { user } = useUser() as IUserContext;
-
-  const emitMessage = (message: IMessage) => {
-    socket.emit("message", message);
-  }
 
   useEffect(() => {
     fetchDeliveries();
-    socket.on("message", (msg: string) => {
-      console.log(msg);
-    });
 
-    return () => {
-      socket.off("message");
+    const handleMessage = (data: IMessage) => {
+      if(data.to !== "driver") return;
+
+      if(data.type === "new-delivery") {
+        setDeliveries((prev) => [...prev, data.data]);
+        toast.success("New delivery created!");
+      }
     };
+
+    on("message", handleMessage);
+    return () => off("message", handleMessage);
   }, []);
 
   const fetchDeliveries = async () => {
     const result = await sendRequest("/api/delivery/driver", "GET");
-    console.log(result)
     if (result) setDeliveries(result);
+  };
+
+  const emitMessage = (message: IMessage) => {
+    emit("message", message);
   };
 
   const handleUpdateClick = (delivery: Delivery) => {

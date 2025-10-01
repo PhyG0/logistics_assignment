@@ -55,8 +55,6 @@ export const getDeliveries = async (req: IRequest, res: Response) => {
 
     if(!req.user) return res.status(401).json({ message: "Unauthorized" })
 
-    if(req.user.role !== "admin") return res.status(403).json({ message: "Forbidden" })
-    
     try{
         const deliveriesRaw = await Delivery.find({})
 
