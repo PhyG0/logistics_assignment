@@ -6,7 +6,6 @@ interface Driver {
   currentDelivery: string | null;
 }
 
-// src/components/Drivers.tsx
 import { useState, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
 

@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
+import { io, Socket } from "socket.io-client";
+import useUser from "../hooks/useUser";
+import type { IUserContext } from "../context/userContext";
+
+const socket: Socket = io("http://localhost:3001");
 
 interface Delivery {
   _id: string;
@@ -14,6 +19,13 @@ interface Delivery {
   createdAt: string;
 }
 
+export interface IMessage {
+  from: string;
+  to: string;
+  type: string;
+  data: Delivery
+}
+
 const DriverPanel = () => {
   const { sendRequest, loading, error } = useApi();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
@@ -25,9 +37,21 @@ const DriverPanel = () => {
   });
   const [showModal, setShowModal] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const { user } = useUser() as IUserContext;
+
+  const emitMessage = (message: IMessage) => {
+    socket.emit("message", message);
+  }
 
   useEffect(() => {
     fetchDeliveries();
+    socket.on("message", (msg: string) => {
+      console.log(msg);
+    });
+
+    return () => {
+      socket.off("message");
+    };
   }, []);
 
   const fetchDeliveries = async () => {
@@ -59,12 +83,13 @@ const DriverPanel = () => {
     if (updateForm.endTime) updateData.endTime = updateForm.endTime;
 
     const result = await sendRequest("/api/delivery", "PUT", updateData);
-    
+
     setUpdateLoading(false);
     
     if (result) {
       setShowModal(false);
       fetchDeliveries();
+      emitMessage({from: user?._id, to: "admin", type: "update", data: result})
     }
   };
 

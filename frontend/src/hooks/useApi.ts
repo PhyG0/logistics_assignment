@@ -10,7 +10,6 @@ export function useApi() {
   const baseUrl = "http://localhost:3001";
   const navigate = useNavigate();
 
-  // Move token check to useEffect to avoid calling navigate during render
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
