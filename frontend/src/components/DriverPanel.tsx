@@ -94,7 +94,7 @@ const DriverPanel = () => {
     if (result) {
       setShowModal(false);
       fetchDeliveries();
-      emitMessage({from: user?.id, to: "admin", type: "update", data: result})
+      emitMessage({from: user?.id as string, to: "admin", type: "update", data: result})
     }
   };
 
