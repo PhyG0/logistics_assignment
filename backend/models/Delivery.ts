@@ -2,8 +2,8 @@ import { Schema, Document, model } from "mongoose";
 import mongoose from "mongoose";
 
 export interface IDelivery extends Document {
-    vehicle: mongoose.Types.ObjectId,
-    driver: mongoose.Types.ObjectId,
+    vehicle: mongoose.Types.ObjectId | null,
+    driver: mongoose.Types.ObjectId | null,
     receiver: mongoose.Types.ObjectId,
     startLocation: string,
     endLocation: string,
@@ -11,16 +11,20 @@ export interface IDelivery extends Document {
     endTime: Date,
     createdAt: Date,
     currentLocation: string,
+    message: string,
+    status: "pending" | "assigned" | "in-progress" | "completed",
 }
 
 export const DeliverySchema = new Schema<IDelivery>({
     vehicle: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: false,
+        default: null
     },
     driver: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: false,
+        default: null
     },
     receiver: {
         type: Schema.Types.ObjectId,
@@ -28,7 +32,7 @@ export const DeliverySchema = new Schema<IDelivery>({
     },
     startLocation: {
         type: String,
-        required: true
+        required: false
     },
     endLocation: {
         type: String,
@@ -46,6 +50,15 @@ export const DeliverySchema = new Schema<IDelivery>({
     },
     currentLocation: {
         type: String
+    },
+    message: {
+        type: String,
+        required: false
+    },
+    status: {
+        type: String,
+        enum: ["pending", "assigned", "in-progress", "completed"],
+        default: "pending"
     }
 })
 

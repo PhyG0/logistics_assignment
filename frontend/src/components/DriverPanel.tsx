@@ -57,7 +57,7 @@ const DriverPanel = () => {
   }, []);
 
   const fetchDeliveries = async () => {
-    const result = await sendRequest("/api/delivery/driver", "GET");
+    const result = await sendRequest("/api/delivery", "GET");
     if (result) setDeliveries(result);
   };
 

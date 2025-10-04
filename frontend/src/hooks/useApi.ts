@@ -6,7 +6,8 @@ export function useApi() {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const baseUrl = "https://logistics-assignment.onrender.com";
+  // const baseUrl = "https://logistics-assignment.onrender.com";
+  const baseUrl = "http://localhost:3001";
 
   const sendRequest = async (
     url: string,

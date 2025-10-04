@@ -4,10 +4,9 @@ import useUser from "../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import AdminPanel from "./AdminPanel";
 import DriverPanel from "./DriverPanel";
-import Deliveries from "./Deliveries";
+import UserPanel from "./UserPanel";
 
 export default function Home() {
-
     const navigate = useNavigate();
     const { user } = useUser() as IUserContext;
 
@@ -21,7 +20,7 @@ export default function Home() {
         <div className="min-h-screen bg-gray-200">
             {user?.role === "admin" && <AdminPanel />}
             {user?.role === "driver" && <DriverPanel />}
-            {user?.role === "user" && <Deliveries />}
+            {user?.role === "user" && <UserPanel />}
         </div>
     );
 }

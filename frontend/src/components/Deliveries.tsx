@@ -66,7 +66,8 @@ const Deliveries = () => {
               return { 
                 ...delivery, 
                 currentLocation: msg.data.currentLocation, 
-                endTime: msg.data.endTime 
+                endTime: msg.data.endTime, 
+                startTime: msg.data.startTime
               };
             }
             return delivery;
@@ -81,7 +82,6 @@ const Deliveries = () => {
       else if (msg.type === "new-delivery" && msg.data) {
         toast.success("New delivery created!");
 
-        // Re-fetch deliveries and highlight the new one
         fetchDeliveries(msg.data._id);
       }
     };
@@ -94,9 +94,10 @@ const Deliveries = () => {
     const result = await sendRequest("/api/delivery", "GET");
     if (!result) return;
 
+      console.log(result);
     let filtered = result;
     if (user?.role === "user") {
-      filtered = result.filter((d: Delivery) => d.receiver.id === user.id);
+      filtered = result.filter((d: Delivery) => d.receiver._id === user.id);
     } else if (user?.role === "driver") {
       filtered = result.filter((d: Delivery) => d.driver.id === user.id);
     }

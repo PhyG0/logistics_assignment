@@ -2,10 +2,10 @@ import { useState } from "react";
 import Vehicles from "./Vehicles";
 import Deliveries from "./Deliveries";
 import Drivers from "./Drivers";
-import CreateDelivery from "./CreateDelivery";
+import AdminAssignDelivery from "./AdminAssignDelivery";
 
 const AdminPanel = () => {
-  const [activeTab, setActiveTab] = useState<"vehicles" | "deliveries" | "drivers" | "create-delivery">("vehicles");
+  const [activeTab, setActiveTab] = useState<"vehicles" | "deliveries" | "drivers" | "assign-delivery">("vehicles");
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -16,7 +16,7 @@ const AdminPanel = () => {
           Admin Panel
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          {["vehicles", "drivers", "deliveries", "create-delivery"].map((tab) => (
+          {["vehicles", "drivers", "deliveries", "assign-delivery"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
@@ -24,8 +24,8 @@ const AdminPanel = () => {
                 activeTab === tab ? "bg-blue-700 text-white" : ""
               }`}
             >
-              {tab === "create-delivery"
-                ? "Create Delivery"
+              {tab === "assign-delivery"
+                ? "Assign Delivery"
                 : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
@@ -46,7 +46,7 @@ const AdminPanel = () => {
       {/* Mobile Menu */}
       {menuOpen && (
         <nav className="md:hidden bg-white shadow p-4 space-y-2">
-          {["vehicles", "drivers", "deliveries", "create-delivery"].map((tab) => (
+          {["vehicles", "drivers", "deliveries", "assign-delivery"].map((tab) => (
             <button
               key={tab}
               onClick={() => {
@@ -57,8 +57,8 @@ const AdminPanel = () => {
                 activeTab === tab ? "bg-blue-700 text-white" : ""
               }`}
             >
-              {tab === "create-delivery"
-                ? "Create Delivery"
+              {tab === "assign-delivery"
+                ? "Assign Delivery"
                 : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
@@ -70,7 +70,7 @@ const AdminPanel = () => {
         {activeTab === "vehicles" && <Vehicles />}
         {activeTab === "deliveries" && <Deliveries />}
         {activeTab === "drivers" && <Drivers />}
-        {activeTab === "create-delivery" && <CreateDelivery />}
+        {activeTab === "assign-delivery" && <AdminAssignDelivery />}
       </main>
     </div>
   );
