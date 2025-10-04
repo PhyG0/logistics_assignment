@@ -28,7 +28,7 @@ const main = async () => {
 
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173", 
+      origin: "https://logistics-assignment.vercel.app", 
       methods: ["GET", "POST"],
     },
   });
