@@ -1,12 +1,8 @@
 import { useState } from "react";
 import { useApi } from "../hooks/useApi";
 import toast from "react-hot-toast";
-import useUser from "../hooks/useUser";
-import type { IUserContext } from "../context/userContext";
-
 const UserCreateDelivery = () => {
   const { sendRequest, loading, error } = useApi();
-  const { user } = useUser() as IUserContext;
 
   const [formData, setFormData] = useState({
     endLocation: "",
