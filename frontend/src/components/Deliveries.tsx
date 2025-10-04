@@ -96,9 +96,9 @@ const Deliveries = () => {
 
     let filtered = result;
     if (user?.role === "user") {
-      filtered = result.filter((d: Delivery) => d.receiver._id === user.id);
+      filtered = result.filter((d: Delivery) => d.receiver.id === user.id);
     } else if (user?.role === "driver") {
-      filtered = result.filter((d: Delivery) => d.driver._id === user.id);
+      filtered = result.filter((d: Delivery) => d.driver.id === user.id);
     }
 
     setDeliveries(filtered);
