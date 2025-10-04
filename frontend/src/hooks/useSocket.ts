@@ -6,7 +6,7 @@ interface SocketOptions {
   autoConnect?: boolean;
 }
 
-export function useSocket({ url = "http://localhost:3001", autoConnect = true }: SocketOptions = {}) {
+export function useSocket({ url = "https://logistics-assignment.onrender.com", autoConnect = true }: SocketOptions = {}) {
   const socketRef = useRef<Socket | null>(null);
   const [connected, setConnected] = useState(false);
 

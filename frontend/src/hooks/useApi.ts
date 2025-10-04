@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -7,15 +6,7 @@ export function useApi() {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const baseUrl = "http://localhost:3001";
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    }
-  }, [navigate]);
+  const baseUrl = "https://logistics-assignment.onrender.com";
 
   const sendRequest = async (
     url: string,
