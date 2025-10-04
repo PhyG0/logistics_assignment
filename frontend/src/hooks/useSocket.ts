@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { API_URL } from "../config/url";
 
 interface SocketOptions {
   url?: string;
   autoConnect?: boolean;
 }
 
-// export function useSocket({ url = "https://logistics-assignment.onrender.com", autoConnect = true }: SocketOptions = {}) {
-export function useSocket({ url = "http://localhost:3001", autoConnect = true }: SocketOptions = {}) {
+export function useSocket({ url = API_URL, autoConnect = true }: SocketOptions = {}) {
   const socketRef = useRef<Socket | null>(null);
   const [connected, setConnected] = useState(false);
 

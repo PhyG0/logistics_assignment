@@ -2,12 +2,12 @@ import { useState } from "react";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
+import { API_URL } from "../config/url";
+
 export function useApi() {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  // const baseUrl = "https://logistics-assignment.onrender.com";
-  const baseUrl = "http://localhost:3001";
 
   const sendRequest = async (
     url: string,
@@ -20,7 +20,7 @@ export function useApi() {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch(baseUrl + url, {
+      const response = await fetch(API_URL + url, {
         method,
         headers: {
           "Content-Type": "application/json",

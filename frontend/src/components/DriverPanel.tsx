@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
 import { useSocket } from "../hooks/useSocket"; 
 import useUser from "../hooks/useUser";
-import type { IUserContext } from "../context/userContext";
+import type { IUser, IUserContext } from "../context/userContext";
 import toast from "react-hot-toast";
 
 interface Delivery {
   _id: string;
   vehicle: string;
-  driver: string;
-  receiver: string;
+  driver: IUser;
+  receiver: IUser;
   startLocation: string;
   endLocation: string;
   currentLocation: string;
@@ -58,7 +58,10 @@ const DriverPanel = () => {
 
   const fetchDeliveries = async () => {
     const result = await sendRequest("/api/delivery", "GET");
-    if (result) setDeliveries(result);
+    if (result) {
+      const driverDeliveries = result.filter((d: Delivery) => d?.driver?._id === user?.id);
+      setDeliveries(driverDeliveries);
+    }
   };
 
   const emitMessage = (message: IMessage) => {
