@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useApi } from "../hooks/useApi";
 import toast from "react-hot-toast";
+import { SearchLocation, type ILocation } from "./searchLocation";
+
 const UserCreateDelivery = () => {
   const { sendRequest, loading, error } = useApi();
 
   const [formData, setFormData] = useState({
-    endLocation: "",
-    message: ""
+    message: "", 
+    endLocation: "" as unknown as ILocation
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -14,19 +16,23 @@ const UserCreateDelivery = () => {
   };
 
   const handleSubmit = async () => {
-    if (!formData.endLocation) {
-      toast.error("Please enter a destination");
+    if (!formData.endLocation || !formData.endLocation.formatted) {
+      toast.error("Please select a valid endLocation");
       return;
     }
     const result = await sendRequest("/api/delivery/request", "POST", formData);
     if (result) {
       toast.success("Delivery request created successfully!");
       setFormData({
-        endLocation: "",
-        message: ""
+        message: "",
+        endLocation: "" as unknown as ILocation
       });
     }
   };
+
+  const handleLocationSelect = (location: ILocation) => {
+    setFormData({ ...formData, endLocation: location });
+  }
 
   return (
     <div className="p-6 bg-white rounded shadow max-w-2xl mx-auto">
@@ -35,13 +41,8 @@ const UserCreateDelivery = () => {
       <div className="grid gap-4">
         <div>
           <label className="block font-medium mb-1">Destination *</label>
-          <input
-            name="endLocation"
-            value={formData.endLocation}
-            onChange={handleChange}
-            placeholder="Enter delivery destination"
-            className="w-full border p-2 rounded"
-          />
+          <SearchLocation onSelectLocation={handleLocationSelect} />
+  
         </div>
 
         <div>

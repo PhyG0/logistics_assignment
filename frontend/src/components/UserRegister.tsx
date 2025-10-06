@@ -6,7 +6,6 @@ export const UserRegister = () => {
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const { data, error, loading, sendRequest } = useApi();
   const ROLE = "user";
@@ -68,16 +67,6 @@ export const UserRegister = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Location</label>
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 

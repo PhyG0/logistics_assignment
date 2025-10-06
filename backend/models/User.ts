@@ -6,11 +6,18 @@ export enum Role {
     DRIVER = 'driver'
 }
 
+export interface ILocation {
+    formatted: string;
+    place_id: string;
+    lat: number;
+    lon: number;
+}
+
 export interface IUser extends Document {
     username: string,
     email: string, 
     password: string,
-    location: string,
+    location: ILocation,
     role: Role,
     age: number,
     phone: string
@@ -30,7 +37,12 @@ const UserSchema = new Schema<IUser>({
         required: true
     },
     location: {
-        type: String,
+        type: {
+            formatted: String,
+            place_id: String,
+            lat: Number,
+            lon: Number
+        },  
     }, 
     role: {
         type: String,

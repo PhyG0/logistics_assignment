@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import useUser from "../hooks/useUser";
 import type { IUserContext } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
+import type { ILocation } from "./searchLocation";
 
 export interface IVehicle {
   _id: string;
@@ -14,26 +15,14 @@ export interface IVehicle {
   capacity: number;
 }
 
-interface Delivery {
+export interface IDelivery {
   _id: string;
-  vehicle: IVehicle;
-  driver: IUser;
-  receiver: IUser;
-  startLocation: string;
-  endLocation: string;
-  currentLocation?: string;
-  startTime: number;
-  endTime: number;
-}
-
-interface IDelivery {
-  _id: string;
-  vehicle: string;
-  driver: string;
-  receiver: string;
-  startLocation: string;
-  endLocation: string;
-  currentLocation?: string;
+  vehicle: IVehicle | null;
+  driver: IUser | null;
+  receiver: IUser | null;
+  startLocation: ILocation;
+  endLocation: ILocation;
+  currentLocation?: ILocation;
   startTime: number;
   endTime: number;
 }
@@ -48,7 +37,7 @@ export interface IMessage {
 const Deliveries = () => {
   const { sendRequest, loading, error } = useApi();
   const { on, off } = useSocket(); 
-  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+  const [deliveries, setDeliveries] = useState<IDelivery[]>([]);
   const [updatedId, setUpdatedId] = useState<string | null>(null);
   const { user } = useUser() as IUserContext;
   const navigate = useNavigate();
@@ -60,19 +49,13 @@ const Deliveries = () => {
 
     const handleMessage = (msg: IMessage) => {
       if (msg.type === "update" && msg.data) {
-        setDeliveries((prev) =>
-          prev.map((delivery) => {
-            if (delivery._id === msg.data._id) {
-              return { 
-                ...delivery, 
-                currentLocation: msg.data.currentLocation, 
-                endTime: msg.data.endTime, 
-                startTime: msg.data.startTime
-              };
-            }
-            return delivery;
-          })
-        );
+        setDeliveries((prev) => {
+          const index = prev.findIndex((d) => d._id === msg.data._id);
+          if (index !== -1) {
+            return [...prev.slice(0, index), msg.data, ...prev.slice(index + 1)];
+          }
+          return prev;
+        });
 
         setUpdatedId(msg.data._id);
         setTimeout(() => setUpdatedId(null), 2000);
@@ -97,9 +80,9 @@ const Deliveries = () => {
       console.log(result);
     let filtered = result;
     if (user?.role === "user") {
-      filtered = result.filter((d: Delivery) => d.receiver._id === user.id);
+      filtered = result.filter((d: IDelivery) => d.receiver?._id === user.id);
     } else if (user?.role === "driver") {
-      filtered = result.filter((d: Delivery) => d.driver.id === user.id);
+      filtered = result.filter((d: IDelivery) => d.driver?.id === user.id);
     }
 
     setDeliveries(filtered);
@@ -137,9 +120,9 @@ const Deliveries = () => {
               <td className="p-2 border">{d.vehicle?.number || "N/A"}</td>
               <td className="p-2 border">{d.driver?.username || "N/A"}</td>
               <td className="p-2 border">{d.receiver?.username || "N/A"}</td>
-              <td className="p-2 border">{d.startLocation}</td>
-              <td className="p-2 border">{d.endLocation}</td>
-              <td className="p-2 border">{d.currentLocation || "N/A"}</td>
+              <td className="p-2 border">{d.startLocation?.formatted || ""}</td>
+              <td className="p-2 border">{d.endLocation.formatted}</td>
+              <td className="p-2 border">{d.currentLocation?.formatted || "N/A"}</td>
               <td className="p-2 border">
                 {d.endTime ? "Completed" : d.startTime ? "In Progress" : "Pending"}
               </td>

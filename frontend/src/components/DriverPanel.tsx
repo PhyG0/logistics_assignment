@@ -2,27 +2,17 @@ import { useState, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
 import { useSocket } from "../hooks/useSocket"; 
 import useUser from "../hooks/useUser";
-import type { IUser, IUserContext } from "../context/userContext";
+import type { IUserContext } from "../context/userContext";
 import toast from "react-hot-toast";
-
-interface Delivery {
-  _id: string;
-  vehicle: string;
-  driver: IUser;
-  receiver: IUser;
-  startLocation: string;
-  endLocation: string;
-  currentLocation: string;
-  startTime: string | null;
-  endTime: string | null;
-  createdAt: string;
-}
+import type { IDelivery } from "./Deliveries";
+import type { ILocation } from "./searchLocation";
+import { SearchLocation } from "./searchLocation";
 
 export interface IMessage {
   from: string;
   to: string;
   type: string;
-  data: Delivery;
+  data: IDelivery;
 }
 
 const DriverPanel = () => {
@@ -30,10 +20,14 @@ const DriverPanel = () => {
   const { user } = useUser() as IUserContext;
   const { emit, on, off } = useSocket();
 
-  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
-  const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(null);
-  const [updateForm, setUpdateForm] = useState({
-    currentLocation: "",
+  const [deliveries, setDeliveries] = useState<IDelivery[]>([]);
+  const [selectedDelivery, setSelectedDelivery] = useState<IDelivery | null>(null);
+  const [updateForm, setUpdateForm] = useState<{
+    currentLocation: ILocation | null,
+    startTime: string,
+    endTime: string
+  }>({
+    currentLocation: null,
     startTime: "",
     endTime: ""
   });
@@ -59,7 +53,7 @@ const DriverPanel = () => {
   const fetchDeliveries = async () => {
     const result = await sendRequest("/api/delivery", "GET");
     if (result) {
-      const driverDeliveries = result.filter((d: Delivery) => d?.driver?._id === user?.id);
+      const driverDeliveries = result.filter((d: IDelivery) => d?.driver?._id === user?.id);
       setDeliveries(driverDeliveries);
     }
   };
@@ -68,12 +62,12 @@ const DriverPanel = () => {
     emit("message", message);
   };
 
-  const handleUpdateClick = (delivery: Delivery) => {
+  const handleUpdateClick = (delivery: IDelivery) => {
     setSelectedDelivery(delivery);
     setUpdateForm({
-      currentLocation: delivery.currentLocation || "",
-      startTime: delivery.startTime || "",
-      endTime: delivery.endTime || ""
+      currentLocation: delivery.currentLocation || null,
+      startTime: String(delivery.startTime) || "",
+      endTime: String(delivery.endTime) || ""
     });
     setShowModal(true);
   };
@@ -82,7 +76,7 @@ const DriverPanel = () => {
     e.preventDefault();
     setUpdateLoading(true);
 
-    const updateData: any = {
+    const updateData: { deliveryId: string | undefined; currentLocation?: ILocation | null; startTime?: string; endTime?: string } = {
       deliveryId: selectedDelivery?._id,
     };
 
@@ -101,17 +95,17 @@ const DriverPanel = () => {
     }
   };
 
-  const handleStartDelivery = (delivery: Delivery) => {
+  const handleStartDelivery = (delivery: IDelivery) => {
     setSelectedDelivery(delivery);
     setUpdateForm({
-      currentLocation: delivery.currentLocation,
+      currentLocation: delivery.currentLocation || null,
       startTime: new Date().toISOString(),
       endTime: ""
     });
     setShowModal(true);
   };
 
-  const getDeliveryStatus = (delivery: Delivery) => {
+  const getDeliveryStatus = (delivery: IDelivery) => {
     if (delivery.endTime) return { text: "Completed", color: "bg-green-100 text-green-800" };
     if (delivery.startTime) return { text: "In Progress", color: "bg-yellow-100 text-yellow-800" };
     return { text: "Pending", color: "bg-gray-100 text-gray-800" };
@@ -139,9 +133,9 @@ const DriverPanel = () => {
               const status = getDeliveryStatus(delivery);
               return (
                 <tr key={delivery._id}>
-                  <td className="p-2 border">{delivery.startLocation}</td>
-                  <td className="p-2 border">{delivery.endLocation}</td>
-                  <td className="p-2 border">{delivery.currentLocation || "-"}</td>
+                  <td className="p-2 border">{delivery.startLocation.formatted}</td>
+                  <td className="p-2 border">{delivery.endLocation.formatted}</td>
+                  <td className="p-2 border">{delivery.currentLocation?.formatted || "-"}</td>
                   <td className="p-2 border">
                     <span className={`px-2 py-1 rounded text-sm ${status.color}`}>
                       {status.text}
@@ -199,13 +193,7 @@ const DriverPanel = () => {
             <form onSubmit={handleUpdateSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Current Location</label>
-                <input
-                  type="text"
-                  value={updateForm.currentLocation}
-                  onChange={(e) => setUpdateForm({ ...updateForm, currentLocation: e.target.value })}
-                  className="w-full border rounded px-3 py-2"
-                  placeholder="Enter current location"
-                />
+                <SearchLocation onSelectLocation={(loc) => setUpdateForm({ ...updateForm, currentLocation: loc })} />
               </div>
 
               <div className="mb-4">

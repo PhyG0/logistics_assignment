@@ -12,6 +12,8 @@ export const createDeliveryRequest = async (req: IRequest, res: Response) => {
     try {
         const { endLocation, message } = req.body;
 
+        console.log(endLocation, message)
+
         if (!endLocation) {
             return res.status(400).json({ message: "endLocation is required" });
         }

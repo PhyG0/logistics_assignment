@@ -9,6 +9,7 @@ import connectDB from "./config/database";
 import authRoutes from "./routes/auth";
 import vehicleRoutes from "./routes/vehicle";
 import deliveryRoutes from "./routes/delivery";
+import geoapifyRouter from "./routes/geoapify";
 
 dotenv.config();
 
@@ -23,6 +24,11 @@ const main = async () => {
   app.use("/api/auth", authRoutes);
   app.use("/api/vehicle", vehicleRoutes);
   app.use("/api/delivery", deliveryRoutes);
+  app.use("/api/geoapify", geoapifyRouter);
+
+  app.get("/", (req, res) => {
+    res.send("API is running...");
+  });
 
   const server = http.createServer(app);
 

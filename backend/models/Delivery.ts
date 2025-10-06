@@ -1,16 +1,17 @@
 import { Schema, Document, model } from "mongoose";
 import mongoose from "mongoose";
+import { ILocation } from "./User";
 
 export interface IDelivery extends Document {
     vehicle: mongoose.Types.ObjectId | null,
     driver: mongoose.Types.ObjectId | null,
     receiver: mongoose.Types.ObjectId,
-    startLocation: string,
-    endLocation: string,
+    startLocation: ILocation,
+    endLocation: ILocation,
     startTime: Date,
     endTime: Date,
     createdAt: Date,
-    currentLocation: string,
+    currentLocation: ILocation,
     message: string,
     status: "pending" | "assigned" | "in-progress" | "completed",
 }
@@ -31,11 +32,26 @@ export const DeliverySchema = new Schema<IDelivery>({
         required: true
     },
     startLocation: {
-        type: String,
-        required: false
+        type: {
+            formatted: String,
+            place_id: String,
+            lat: Number,
+            lon: Number
+        },
+        default: {
+            formatted: "",
+            place_id: "",
+            lat: 0,
+            lon: 0
+        }
     },
     endLocation: {
-        type: String,
+        type: {
+            formatted: String,
+            place_id: String,
+            lat: Number,
+            lon: Number
+        },
         required: true
     },
     startTime: {
@@ -49,7 +65,12 @@ export const DeliverySchema = new Schema<IDelivery>({
         default: Date.now    
     },
     currentLocation: {
-        type: String
+        type: {
+            formatted: String,
+            place_id: String,
+            lat: Number,
+            lon: Number
+        }
     },
     message: {
         type: String,

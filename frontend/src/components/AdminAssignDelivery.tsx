@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useApi } from "../hooks/useApi";
 import { useSocket } from "../hooks/useSocket";
 import toast from "react-hot-toast";
+import type { ILocation } from "./searchLocation";
+import { SearchLocation } from "./searchLocation";
 
 interface Driver {
   _id: string;
@@ -25,7 +27,7 @@ interface User {
 interface PendingDelivery {
   _id: string;
   receiver: User;
-  endLocation: string;
+  endLocation: ILocation;
   message?: string;
   status: string;
   createdAt: string;
@@ -40,12 +42,18 @@ const AdminAssignDelivery = () => {
   const [pendingDeliveries, setPendingDeliveries] = useState<PendingDelivery[]>([]);
   const [selectedDelivery, setSelectedDelivery] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    vehicleNumber: string;
+    driverEmail: string;
+    startLocation: ILocation | null;
+    currentLocation: ILocation | null;
+  }>({
     vehicleNumber: "",
     driverEmail: "",
-    startLocation: "",
-    currentLocation: ""
+    startLocation: null,
+    currentLocation: null
   });
+
 
   useEffect(() => {
     fetchPendingDeliveries();
@@ -69,16 +77,20 @@ const AdminAssignDelivery = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
+
 
   const handleSelectDelivery = (deliveryId: string) => {
     setSelectedDelivery(deliveryId);
     setFormData({
       vehicleNumber: "",
       driverEmail: "",
-      startLocation: "",
-      currentLocation: ""
+      startLocation: null,
+      currentLocation: null
     });
   };
 
@@ -100,8 +112,8 @@ const AdminAssignDelivery = () => {
       setFormData({
         vehicleNumber: "",
         driverEmail: "",
-        startLocation: "",
-        currentLocation: ""
+        startLocation: null,
+        currentLocation: null
       });
       fetchPendingDeliveries();
       fetchVehicles();
@@ -145,7 +157,7 @@ const AdminAssignDelivery = () => {
                   {delivery.receiver.username}
                 </div>
                 <div className="text-sm text-gray-600">
-                  To: {delivery.endLocation}
+                  To: {delivery.endLocation.formatted}
                 </div>
                 {delivery.message && (
                   <div className="text-sm text-gray-500 mt-1">
@@ -174,7 +186,7 @@ const AdminAssignDelivery = () => {
                   Receiver: {selectedDeliveryData?.receiver.username}
                 </div>
                 <div className="text-sm">
-                  Destination: {selectedDeliveryData?.endLocation}
+                  Destination: {selectedDeliveryData?.endLocation.formatted}
                 </div>
                 {selectedDeliveryData?.message && (
                   <div className="text-sm mt-1">
@@ -226,18 +238,13 @@ const AdminAssignDelivery = () => {
                   ))}
                 </select>
               </div>
-
               {/* Start Location */}
               <div>
-                <label className="block font-medium mb-1">
-                  Pickup Location *
-                </label>
-                <input
-                  name="startLocation"
-                  value={formData.startLocation}
-                  onChange={handleChange}
-                  placeholder="Enter pickup location"
-                  className="w-full border p-2 rounded"
+                <label className="block font-medium mb-1">Pickup Location *</label>
+                <SearchLocation
+                  onSelectLocation={(loc: ILocation) =>
+                    setFormData((prev) => ({ ...prev, startLocation: loc }))
+                  }
                 />
               </div>
 
@@ -246,12 +253,10 @@ const AdminAssignDelivery = () => {
                 <label className="block font-medium mb-1">
                   Current Location (optional)
                 </label>
-                <input
-                  name="currentLocation"
-                  value={formData.currentLocation}
-                  onChange={handleChange}
-                  placeholder="Current location of package"
-                  className="w-full border p-2 rounded"
+                <SearchLocation
+                  onSelectLocation={(loc: ILocation) =>
+                    setFormData((prev) => ({ ...prev, currentLocation: loc }))
+                  }
                 />
               </div>
 
