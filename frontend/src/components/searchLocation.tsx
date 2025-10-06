@@ -14,9 +14,8 @@ interface SearchLocationProps {
 
 export const SearchLocation = ({ onSelectLocation }: SearchLocationProps) => {
     const [query, setQuery] = useState("");
-    const { sendRequest, loading, error } = useApi();
+    const { sendRequest, error } = useApi();
     const [results, setResults] = useState<any[]>([]);
-    const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(null);
     const debounceRef = useRef<number | null>(null);
 
     const handleSearch = async () => {
@@ -53,7 +52,6 @@ export const SearchLocation = ({ onSelectLocation }: SearchLocationProps) => {
             lat: location.geometry.coordinates[1],
             lon: location.geometry.coordinates[0]
         }
-        setSelectedLocation(loc);
         onSelectLocation(loc);
         setQuery(location.properties.formatted);
         setResults([]);

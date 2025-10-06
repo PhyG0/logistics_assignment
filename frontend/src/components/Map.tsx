@@ -29,13 +29,11 @@ const ChangeView = ({ center, zoom }: { center: [number, number]; zoom: number }
 const RouteUpdater = ({ A, B }: { A: ILocation; B: ILocation }) => {
   const map = useMap();
   const [route, setRoute] = useState<RoutePoint[]>([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!A?.lat || !A?.lon || !B?.lat || !B?.lon) return;
 
     const fetchRoute = async () => {
-      setLoading(true);
       try {
         const apiKey = "12624834a62046a48286d81e0bbdd2f4";
         const url = `https://api.geoapify.com/v1/routing?waypoints=${A.lat},${A.lon}|${B.lat},${B.lon}&mode=drive&apiKey=${apiKey}`;
@@ -62,9 +60,7 @@ const RouteUpdater = ({ A, B }: { A: ILocation; B: ILocation }) => {
       } catch (err) {
         console.error("Failed to fetch route:", err);
         setRoute([]);
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
 
     fetchRoute();

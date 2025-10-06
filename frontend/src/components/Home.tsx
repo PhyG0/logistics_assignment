@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import AdminPanel from "./AdminPanel";
 import DriverPanel from "./DriverPanel";
 import UserPanel from "./UserPanel";
-import { SearchLocation } from "./searchLocation";
 
 export default function Home() {
     const navigate = useNavigate();
