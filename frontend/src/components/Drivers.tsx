@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react";
+import { useApi } from "../hooks/useApi";
+
 interface Driver {
   age: string;
   _id: string;
@@ -6,9 +9,6 @@ interface Driver {
   phone?: string;
   currentDelivery: string | null;
 }
-
-import { useState, useEffect } from "react";
-import { useApi } from "../hooks/useApi";
 
 const Drivers = () => {
   const { sendRequest, loading, error } = useApi();
@@ -21,38 +21,40 @@ const Drivers = () => {
   const fetchDrivers = async () => {
     const result = await sendRequest("/api/delivery/drivers", "GET");
     if (result) setDrivers(result);
-    console.log(result)
+    console.log(result);
   };
 
   return (
-    <div>
+    <div className="p-4 flex flex-col gap-4">
       <h2 className="text-2xl font-bold mb-4">Drivers</h2>
 
-      <table className="w-full bg-white rounded shadow">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="p-2 border">Name</th>
-            <th className="p-2 border">Email</th>
-            <th className="p-2 border">Phone</th>
-            <th className="p-2 border">Age</th>
-            <th className="p-2 border">Available</th>
-          </tr>
-        </thead>
-        <tbody>
-          {drivers.map((d) => (
-            <tr key={d._id}>
-              <td className="p-2 border">{d.username}</td>
-              <td className="p-2 border">{d.email}</td>
-              <td className="p-2 border">{d.phone || "-"}</td>
-              <td className="p-2 border">{d.age || "-"}</td>
-              <td className="p-2 border">{d.currentDelivery ? "No" : "Yes"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Drivers List */}
+      <div className="flex flex-col gap-4">
+        {drivers.map((d) => (
+          <div
+            key={d._id}
+            className="bg-white rounded-lg shadow p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2"
+          >
+            <div className="flex flex-col sm:flex-row sm:gap-4">
+              <p><span className="font-semibold">Name:</span> {d.username}</p>
+              <p><span className="font-semibold">Email:</span> {d.email}</p>
+              <p><span className="font-semibold">Phone:</span> {d.phone || "-"}</p>
+              <p><span className="font-semibold">Age:</span> {d.age || "-"}</p>
+              <p>
+                <span className="font-semibold">Available:</span>{" "}
+                {d.currentDelivery ? "No" : "Yes"}
+              </p>
+            </div>
+          </div>
+        ))}
 
-      {loading && <p className="mt-2">Loading...</p>}
-      {error && <p className="mt-2 text-red-600">{error}</p>}
+        {drivers.length === 0 && !loading && (
+          <p className="text-gray-500">No drivers available.</p>
+        )}
+
+        {loading && <p>Loading...</p>}
+        {error && <p className="text-red-600">{error}</p>}
+      </div>
     </div>
   );
 };

@@ -29,11 +29,13 @@ const ChangeView = ({ center, zoom }: { center: [number, number]; zoom: number }
 const RouteUpdater = ({ A, B }: { A: ILocation; B: ILocation }) => {
   const map = useMap();
   const [route, setRoute] = useState<RoutePoint[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!A?.lat || !A?.lon || !B?.lat || !B?.lon) return;
 
     const fetchRoute = async () => {
+      setLoading(true);
       try {
         const apiKey = "12624834a62046a48286d81e0bbdd2f4";
         const url = `https://api.geoapify.com/v1/routing?waypoints=${A.lat},${A.lon}|${B.lat},${B.lon}&mode=drive&apiKey=${apiKey}`;
@@ -53,13 +55,15 @@ const RouteUpdater = ({ A, B }: { A: ILocation; B: ILocation }) => {
         // Fit bounds to show entire route
         if (routePoints.length > 0) {
           const bounds = L.latLngBounds(
-            routePoints.map(p => [p.lat, p.lon] as [number, number])
+            routePoints.map((p: RoutePoint) => [p.lat, p.lon] as [number, number])
           );
           map.fitBounds(bounds, { padding: [50, 50] });
         }
       } catch (err) {
         console.error("Failed to fetch route:", err);
         setRoute([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -69,8 +73,9 @@ const RouteUpdater = ({ A, B }: { A: ILocation; B: ILocation }) => {
   return route.length > 0 ? (
     <Polyline
       positions={route.map((p) => [p.lat, p.lon])}
-      color="blue"
-      weight={5}
+      color="#2563eb"
+      weight={4}
+      opacity={0.8}
     />
   ) : null;
 };
@@ -79,15 +84,35 @@ const Map = ({ A, B }: MapProps) => {
   const center: [number, number] = A?.lat && A?.lon ? [A.lat, A.lon] : [0, 0];
 
   if (!A || !B) {
-    return <div className="h-[80vh] w-full rounded-xl bg-gray-100 flex items-center justify-center">No location data available</div>;
+    return (
+      <div className="h-full w-full bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+            />
+          </svg>
+          <p className="mt-2 text-sm text-gray-500">No location data available</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <MapContainer
       center={center}
       zoom={13}
-      className="h-[80vh] w-full rounded-xl"
+      className="h-full w-full"
       scrollWheelZoom
+      zoomControl={true}
     >
       <ChangeView center={center} zoom={13} />
 
@@ -100,18 +125,34 @@ const Map = ({ A, B }: MapProps) => {
         position={[A.lat, A.lon]}
         icon={L.icon({
           iconUrl: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32],
         })}
       >
-        <Popup>{A.formatted}</Popup>
+        <Popup>
+          <div className="text-sm">
+            <p className="font-semibold text-green-700">Current Location</p>
+            <p className="text-gray-600">{A.formatted}</p>
+          </div>
+        </Popup>
       </Marker>
 
       <Marker
         position={[B.lat, B.lon]}
         icon={L.icon({
           iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32],
         })}
       >
-        <Popup>{B.formatted}</Popup>
+        <Popup>
+          <div className="text-sm">
+            <p className="font-semibold text-red-700">Destination</p>
+            <p className="text-gray-600">{B.formatted}</p>
+          </div>
+        </Popup>
       </Marker>
 
       <RouteUpdater A={A} B={B} />
