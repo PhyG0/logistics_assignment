@@ -34,7 +34,8 @@ export interface IMessage {
   data: IDelivery;
 }
 
-const Deliveries = () => {
+const Deliveries = ({ setCurrentDelivery }: { setCurrentDelivery?: (d: IDelivery | null) => void
+ }) => {
   const { sendRequest, loading, error } = useApi();
   const { on, off } = useSocket(); 
   const [deliveries, setDeliveries] = useState<IDelivery[]>([]);
@@ -72,6 +73,15 @@ const Deliveries = () => {
     on("message", handleMessage);
     return () => off("message", handleMessage);
   }, []);
+
+  useEffect(() => {
+
+    if (setCurrentDelivery) {
+      const current = deliveries.find(d => d.receiver?._id === user?.id && !d.endTime);
+      setCurrentDelivery(current || null);
+    }
+
+  }, [deliveries, setCurrentDelivery, user?.id]);
 
   const fetchDeliveries = async (highlightId?: string) => {
     const result = await sendRequest("/api/delivery", "GET");

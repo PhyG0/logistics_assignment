@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Deliveries from "./Deliveries";
 import UserCreateDelivery from "./UserCreateDelivery";
+import type { IDelivery } from "./Deliveries";
+import Map from "./Map";
 
 const UserPanel = () => {
   const [activeTab, setActiveTab] = useState<"deliveries" | "create-request">("deliveries");
+  const [currentDelivery, setCurrentDelivery] = useState<IDelivery | null>(null);
 
   return (
     <div className="flex flex-col h-screen">
@@ -41,8 +44,13 @@ const UserPanel = () => {
       {/* Main Content */}
       <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
-          {activeTab === "deliveries" && <Deliveries />}
+          {activeTab === "deliveries" && <Deliveries setCurrentDelivery={setCurrentDelivery} />}
           {activeTab === "create-request" && <UserCreateDelivery />}
+          {currentDelivery && (
+            <div className="mt-6 h-96 rounded shadow overflow-hidden">
+              <Map A={currentDelivery.currentLocation ?? currentDelivery.startLocation} B={currentDelivery.endLocation} />
+            </div>
+          )}
         </div>
       </main>
     </div>
